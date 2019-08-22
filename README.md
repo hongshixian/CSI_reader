@@ -50,15 +50,17 @@ subc的结构如下表所示：
 
 
 ```python
+import numpy as np
+from Bfee import Bfee
+from get_scale_csi import get_scale_csi
+
 if __name__ == '__main__':
-    bfee = Bfee.from_file("run-lxx.dat", model_name_encode="gb2312")
-    from pprint import pprint
-    pprint(len(bfee.dicts))
-    pprint(len(bfee.all_csi))
+    bfee = Bfee.from_file("csi.dat", model_name_encode="gb2312")
+    for i in range(len(bfee.all_csi)):
+        csi = get_scale_csi(bfee.dicts[i])
+        print(csi[:,:,i])
 ```
 
-    4993
-    4993
 
 
 # 其他和总结
