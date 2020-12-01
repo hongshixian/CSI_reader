@@ -1,3 +1,10 @@
+# 20201201更新内容：
+
+
+1.调整代码结构。wifilib.py提供两个常用的matlab函数read_bf_file()和get_scale_csi(),与matlab的功能保持一致,方便python调用    
+2.优化程序性能。提高了解析速度    
+3.新增了示例代码，demo.py    
+
 
 # 前言
 
@@ -43,37 +50,42 @@ subc的结构如下表所示：
 到这里，整个文件的数据结构都清楚了，开始试着用python来解析run-lxx.dat这个文件。
 ~~(真想交给王福超来写啊zzz)~~ 
 
-# 文件解析
+# 文件解析  
 
     
-  示例：
+  示例 demo.py：  
 
 
 
 ```python
-import numpy as np
-from Bfee import Bfee
-from get_scale_csi import get_scale_csi
+import matplotlib.pyplot as plt
+from wifilib import *
 
-if __name__ == '__main__':
-    bfee = Bfee.from_file("csi.dat", model_name_encode="gb2312")
-    for i in range(len(bfee.all_csi)):
-        csi = get_scale_csi(bfee.dicts[i])
-        print(csi[:,:,i])
+path = r"./run_lh_1.dat"
+
+bf = read_bf_file(path)
+csi_list = list(map(get_scale_csi,bf))
+csi_np = (np.array(csi_list))
+csi_amp = np.abs(csi_np)
+
+print("csi shape: ",csi_np.shape)
+fig = plt.figure()
+plt.plot(csi_amp[:,0,0,3])
+plt.show()
 ```
+demo示例的解析结果：  
+![avatar](python_plot.png)  
+
+
+matlab的解析结果：  
+![avatar](matlab_plot.png)  
 
 
 
 # 其他和总结
 
-方法的返回两种结果：  
-bfee.dicts字段等同于read_bfee_file() 函数的返回的结果，适用于原来的处理步骤。  
-bfee.all_csi字段是所有csi矩阵的列表，可以直接转化成numpy数组，用来弥补字典性能低下的问题。  
-两个长度一样。
-
-
-
 正确的matlab解析步骤应该是：  
 1.从文件将头部信息和csi矩阵读取到字典,即read_bfee_file()  
 2.依次从字典中取出标准化CSI，即get_scale_csi()  
 3.将所有csi整合到一起，保存为csv
+
